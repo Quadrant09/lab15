@@ -1,0 +1,35 @@
+name: Java CI with Maven
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+        cache: 'maven'
+
+    - name: Verify POM.xml exists
+      run: ls -la demo  # Make sure pom.xml is visible
+
+    - name: Build with Maven
+      working-directory: demo
+      run: mvn clean install -B
+
+    - name: Run tests with Maven (Debug Mode)
+      working-directory: demo
+      run: mvn test -e -X
+
+    - name: Upload Surefire Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: surefire-reports
+        path: demo/target/surefire-reports
